@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZipURL</title>
+    <style>
+        :root {
+            --bg: #f6f8fa;
+            --border: #d0d7de;
+            --text: #1f2328;
+            --muted: #57606a;
+            --accent: #0969da;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 16px;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        h1 {
+            margin-bottom: 12px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 110px;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 8px 14px;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .output-wrap {
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            overflow: hidden;
+        }
+
+        details {
+            width: 100%;
+        }
+
+        summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 12px 14px;
+            font-weight: 600;
+            user-select: none;
+            background: #eef3f9;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .summary-text {
+            flex: 1;
+        }
+
+        .summary-length {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .output-content {
+            padding: 12px 14px 10px;
+            max-height: 260px;
+            overflow: auto;
+        }
+
+        .output-content p {
+            margin: 0 0 8px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .output-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <h1>文字同步輸出</h1>
+    <p>在下面輸入文字，按下按鈕後會在下方顯示相同內容。</p>
+
+    <textarea id="inputText" placeholder="請在這裡輸入文字..."></textarea>
+    <button id="copyBtn" type="button">輸出到下方</button>
+
+    <div class="output-wrap">
+        <details>
+            <summary>
+                <span class="summary-text">原始輸出結果</span>
+                <span id="length-summary" class="summary-length"></span>
+            </summary>
+            <div class="output-content">
+                <p id="outputText"></p>
+                <p id="length" class="muted"></p>
+            </div>
+        </details>
+    </div>
+
+    <div class="output-wrap">
+        <details>
+            <summary>
+                <span class="summary-text">RLE</span>
+                <span id="RLElength-summary" class="summary-length"></span>
+            </summary>
+            <div class="output-content">
+                <p id="RLEoutputText"></p>
+                <p id="RLElength" class="muted"></p>
+                <p id="DeRLE"></p>
+            </div>
+        </details>
+    </div>
+
+    <div class="output-wrap">
+        <details>
+            <summary>
+                <span class="summary-text">Huffman</span>
+                <span id="HUFlength-summary" class="summary-length"></span>
+            </summary>
+            <div class="output-content">
+                <p id="HUFoutputText"></p>
+                <p id="HUFlength" class="muted"></p>
+                <p id="DeHUF"></p>
+            </div>
+        </details>
+    </div>
+
+    <div class="output-wrap">
+        <details>
+            <summary>
+                <span class="summary-text">LZ77</span>
+                <span id="LZ77length-summary" class="summary-length"></span>
+            </summary>
+            <div class="output-content">
+                <p id="LZ77outputText"></p>
+                <p id="LZ77length" class="muted"></p>
+                <p id="DeLZ77"></p>
+            </div>
+        </details>
+    </div>
+
+    <div class="output-wrap">
+        <details>
+            <summary>
+                <span class="summary-text">LZ77+HUF</span>
+                <span id="MIXlength-summary" class="summary-length"></span>
+            </summary>
+            <div class="output-content">
+                <p id="MIXoutputText"></p>
+                <p id="MIXlength" class="muted"></p>
+                <p id="DeMIX"></p>
+            </div>
+        </details>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

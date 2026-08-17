@@ -1,3 +1,4 @@
+// --- DOM 元素選取 ---
 const inputText = document.getElementById("inputText");
 const copyBtn = document.getElementById("copyBtn");
 const outputText = document.getElementById("outputText");
@@ -24,7 +25,12 @@ const MIXlength = document.getElementById("MIXlength");
 const MIXlengthSummary = document.getElementById("MIXlength-summary");
 const DeMIX = document.getElementById("DeMIX");
 
-// RLE
+const JsonTest = document.getElementById("JsonTest");
+const JsonLength = document.getElementById("JsonLength");
+const JsonlengthSummary = document.getElementById("Jsonlength-summary");
+const DeJson = document.getElementById("DeJson");
+
+// 1. RLE
 function RLE(text){
     if(!text){
         return "";
@@ -39,14 +45,11 @@ function RLE(text){
         res += cnt + "#" + text[i - 1];
         cnt = 1;
     }
-
     return res;
 }
 
 function DeRLE(text){
-    if (!text) {
-        return "";
-    }
+    if (!text) return "";
     let res = "", len = text.length, i = 0;
 
     while (i < len) {
@@ -66,7 +69,7 @@ function DeRLE(text){
     return res;
 }
 
-// 霍夫曼
+// 2. 霍夫曼
 class HuffmanNode {
     constructor(char, freq, left = null, right = null){
         this.char = char;
@@ -76,59 +79,36 @@ class HuffmanNode {
     }
 }
 
-class HuffmanCoding{
-
+class HuffmanCoding {
     static getFreqMap(text){
         const freqMap = {};
-
         for(const char of text){
             freqMap[char] = (freqMap[char] || 0) + 1;
         }
-
         return freqMap;
     }
 
     static buildTree(text){
         const freqMap = this.getFreqMap(text);
-
         const nodes = Object.entries(freqMap).map(([char, freq]) => new HuffmanNode(char, freq));
 
-        if(nodes.length === 0){
-            return null;
-        }
-
+        if(nodes.length === 0) return null;
         if(nodes.length === 1){
             const onlyNode = nodes[0];
-
-            return new HuffmanNode(
-                null,
-                onlyNode.freq,
-                onlyNode,
-                null
-            );
+            return new HuffmanNode(null, onlyNode.freq, onlyNode, null);
         }
 
         while(nodes.length > 1){
-
             nodes.sort((a, b) => a.freq - b.freq);
-
             const left = nodes.shift();
             const right = nodes.shift();
-
-            const parent = new HuffmanNode(
-                null,
-                left.freq + right.freq,
-                left,
-                right
-            );
-
+            const parent = new HuffmanNode(null, left.freq + right.freq, left, right);
             nodes.push(parent);
         }
         return nodes[0];
     }
 
     static buildCodeTable(root){
-
         const codeTable = {};
         function traverse(node, currentCode) {
             if(!node) return;
@@ -136,16 +116,8 @@ class HuffmanCoding{
                 codeTable[node.char] = currentCode || "0";
                 return;
             }
-
-            traverse(
-                node.left,
-                currentCode + "0"
-            );
-
-            traverse(
-                node.right,
-                currentCode + "1"
-            );
+            traverse(node.left, currentCode + "0");
+            traverse(node.right, currentCode + "1");
         }
         traverse(root, "");
         return codeTable;
@@ -153,11 +125,9 @@ class HuffmanCoding{
 
     static bytesToCompactStr(bytes){
         let binary = "";
-
         for(let i = 0; i < bytes.byteLength; i++){
             binary += String.fromCharCode(bytes[i]);
         }
-
         return btoa(binary);
     }
 
@@ -172,14 +142,10 @@ class HuffmanCoding{
 
     static encode(text){
         if (!text){
-            return{
-                encoded: "",
-                tree: null,
-                table: {},
-                packed: new Uint8Array(),
-                bitLength: 0,
-                byteLength: 0,
-                compactStr: ""
+            return {
+                encoded: "", tree: null, table: {},
+                packed: new Uint8Array(), bitLength: 0,
+                byteLength: 0, compactStr: ""
             };
         }
 
@@ -192,25 +158,17 @@ class HuffmanCoding{
 
         const packedResult = this.packBits(encoded);
         const compactStrData = this.bytesToCompactStr(packedResult.data);
-        return{
-            encoded: encoded,
-            tree: tree,
-            table: table,
-            packed: packedResult.data,
-            bitLength: packedResult.bitLength,
-            byteLength: packedResult.data.length,
-            compactStr: compactStrData
+        return {
+            encoded: encoded, tree: tree, table: table,
+            packed: packedResult.data, bitLength: packedResult.bitLength,
+            byteLength: packedResult.data.length, compactStr: compactStrData
         };
     }
 
     static packBits(encoded){
-
         if(!encoded){
-            return{
-                data: new Uint8Array(), bitLength: 0
-            };
+            return { data: new Uint8Array(), bitLength: 0 };
         }
-
         const bitLength = encoded.length;
         const byteLength = Math.ceil(bitLength / 8);
         const data = new Uint8Array(byteLength);
@@ -221,17 +179,11 @@ class HuffmanCoding{
             const bitIndex = 7 - (i % 8);
             data[byteIndex] |= bit << bitIndex;
         }
-
-        return{
-            data: data,
-            bitLength: bitLength
-        };
+        return { data: data, bitLength: bitLength };
     }
 
     static unpackBits(data, bitLength){
-        if(!data || bitLength <= 0){
-            return "";
-        }
+        if(!data || bitLength <= 0) return "";
         let encoded = "";
         for(let i = 0; i < bitLength; i++){
             const byteIndex = Math.floor(i / 8);
@@ -243,22 +195,15 @@ class HuffmanCoding{
     }
 
     static decode(encodedText, root){
-        if(!encodedText || !root){
-            return "";
-        }
+        if(!encodedText || !root) return "";
         let decoded = "";
         let currentNode = root;
         if(!root.left && !root.right){
-            return root.char.repeat(
-                encodedText.length
-            );
+            return root.char.repeat(encodedText.length);
         }
 
         for(const bit of encodedText){
-            currentNode = (bit === "0")
-                    ? currentNode.left
-                    : currentNode.right;
-
+            currentNode = (bit === "0") ? currentNode.left : currentNode.right;
             if(!currentNode.left && !currentNode.right){
                 decoded += currentNode.char;
                 currentNode = root;
@@ -268,17 +213,15 @@ class HuffmanCoding{
     }
 
     static decodePacked(data, bitLength, root){
-
         const encoded = this.unpackBits(data, bitLength);
-        return this.decode( encoded, root);
+        return this.decode(encoded, root);
     }
 }
 
-// LZ77
+// 3. LZ77
 class LZ77 {
-    static encode(text, windowSize = 255, minMatch = 3){ //可再修改
+    static encode(text, windowSize = 255, minMatch = 3){
         if (!text) return "";
-
         let res = "";
         let i = 0;
         const len = text.length;
@@ -293,7 +236,6 @@ class LZ77 {
                 while(i + matchLen < len && text[j + matchLen] === text[i + matchLen]){
                     matchLen++;
                 }
-
                 if(matchLen > maxMatchLength){
                     maxMatchLength = matchLen;
                     bestOffset = i - j;
@@ -303,35 +245,30 @@ class LZ77 {
             if(maxMatchLength >= minMatch){
                 res += `(${bestOffset},${maxMatchLength})`;
                 i += maxMatchLength;
-            }else{
-                //愈處理
+            } else {
                 if (text[i] === '('){
                     res += "(0,1)";
-                }else{
+                } else {
                     res += text[i];
                 }
                 i++;
             }
         }
-
         return res;
     }
 
     static decode(compressedText) {
         if (!compressedText) return "";
-
         let res = "";
         let i = 0;
         const len = compressedText.length;
 
         while (i < len) {
-            // 遇到括號代表是引用 (offset,length)
             if (compressedText[i] === '(') {
                 let j = i + 1;
                 while (j < len && compressedText[j] !== ')') {
                     j++;
                 }
-                
                 const tokenStr = compressedText.slice(i + 1, j);
                 const [offset, length] = tokenStr.split(',').map(Number);
 
@@ -343,24 +280,21 @@ class LZ77 {
                         res += res[start + k];
                     }
                 }
-
                 i = j + 1;
             } else {
                 res += compressedText[i];
                 i++;
             }
         }
-
         return res;
     }
 }
 
-// MIX
+// 4. MIX (LZ77 + Huffman)
 class LZ77Huffman {
     static encode(text) {
         const lz77Text = LZ77.encode(text, 4096, 4);
         const huffman = HuffmanCoding.encode(lz77Text);
-
         return {
             lz77: lz77Text,
             huffman: huffman,
@@ -376,51 +310,133 @@ class LZ77Huffman {
     }
 }
 
+// 5. Universal JSON Packer
+class UniversalJsonPacker{
+    static pack(data){
+        const keyList = [];
+        const keyMap = new Map();
+        
+        function getKeyIndex(key){
+            if(!keyMap.has(key)){
+                keyMap.set(key, keyList.length);
+                keyList.push(key);
+            }
+            return keyMap.get(key);
+        }
+
+        function processNode(node){
+            if(node === null || typeof node !== "object"){
+                return node;
+            }else{
+                if(Array.isArray(node)){
+                    if(node.length === 0) return [];
+
+                    const isObjectArray = node.every(item => item && typeof item === "object" && !Array.isArray(item));
+                    if(isObjectArray && node.length > 1){
+                        const keys = Array.from(new Set(node.flatMap(Object.keys)));
+                        const keyIndices = keys.map(k => getKeyIndex(k));
+                        const rows = node.map(item => keys.map(k => item[k] !== undefined ? processNode(item[k]) : null));
+                        return [-1, keyIndices, ...rows];
+                    }
+                    return node.map(processNode);
+                }
+                const packedObj = {};
+                for(const [k, v] of Object.entries(node)){
+                    packedObj[getKeyIndex(k)] = processNode(v);
+                }
+                return packedObj;
+            }
+        }
+
+        const packedData = processNode(data);
+        return JSON.stringify([keyList, packedData]);
+    }
+    
+    static unpack(packedStr){
+        const [keyList, packedData] = JSON.parse(packedStr);
+
+        function restoreNode(node){
+            if(node === null || typeof node !== "object"){
+                return node;
+            }else if(Array.isArray(node)){
+                if(node[0] === -1){
+                    const keyIndices = node[1];
+                    const keys = keyIndices.map(idx => keyList[idx]);
+                    const rows = node.slice(2);
+                    return rows.map(row => {
+                        const obj = {};
+                        keys.forEach((key, i) => {
+                            const val = row[i];
+                            if(val !== null && val !== undefined){
+                                obj[key] = restoreNode(val);
+                            }
+                        });
+                        return obj;
+                    });
+                }
+                return node.map(restoreNode);
+            }
+            const restoreObj = {};
+            for(const [keyIdx, val] of Object.entries(node)){
+                const originalKey = keyList[Number(keyIdx)];
+                restoreObj[originalKey] = restoreNode(val);
+            }
+            return restoreObj;
+        }
+        return restoreNode(packedData);
+    }
+}
 
 copyBtn.addEventListener("click", () => {
     const text = inputText.value;
+    if(!text) return;
     outputText.textContent = text;
     outputLength.textContent = "原始字串長度 : " + text.length;
     lengthSummary.textContent = text.length + " 字元";
 
+    // RLE
     const rleResult = RLE(text);
-    const DeRLEResult = DeRLE(rleResult);
     RLEoutputText.textContent = rleResult;
     RLElength.textContent = "RLE 長度 : " + rleResult.length;
     RLElengthSummary.textContent = rleResult.length + " 字元";
-    DeRLEText.textContent = "還原後 : " + DeRLEResult;
+    DeRLEText.textContent = "還原後 : " + DeRLE(rleResult);
 
-    const rawString = text;
-    const hufResult = HuffmanCoding.encode(rawString);
-
+    // Huffman
+    const hufResult = HuffmanCoding.encode(text);
     HUFoutputText.textContent = hufResult.compactStr;
     HUFlength.textContent = "霍夫曼長度 : " + hufResult.compactStr.length;
     HUFlengthSummary.textContent = hufResult.compactStr.length + " 字元";
+    const recoveredPackedData = HuffmanCoding.compactStrToBytes(hufResult.compactStr, hufResult.byteLength);
+    DeHUF.textContent = "還原後 : " + HuffmanCoding.decodePacked(recoveredPackedData, hufResult.bitLength, hufResult.tree);
 
-    const recoveredPackedData = HuffmanCoding.compactStrToBytes(
-        hufResult.compactStr,
-        hufResult.byteLength
-    );
-    const decodedRawStr = HuffmanCoding.decodePacked(
-        recoveredPackedData,
-        hufResult.bitLength,
-        hufResult.tree
-    );
-
-    DeHUF.textContent = "還原後 : " + decodedRawStr;
-
+    // LZ77
     const lz77Tokens = LZ77.encode(text, 4096, 4);
-    const lz77Decoded = LZ77.decode(lz77Tokens);
-    const lz77Text = JSON.stringify(lz77Tokens);
+    LZ77outputText.textContent = lz77Tokens;
+    LZ77length.textContent = "LZ77 長度 : " + lz77Tokens.length;
+    LZ77lengthSummary.textContent = lz77Tokens.length + " 字元";
+    DeLZ77.textContent = "還原後 : " + LZ77.decode(lz77Tokens);
 
-    LZ77outputText.textContent = lz77Text;
-    LZ77length.textContent = "LZ77 長度 : " + lz77Text.length;
-    LZ77lengthSummary.textContent = lz77Text.length + " 字元";
-    DeLZ77.textContent = "還原後 : " + lz77Decoded;
-
+    // LZ77 + Huffman
     const mixedResult = LZ77Huffman.encode(text);
     MIXoutputText.textContent = mixedResult.mixed;
     MIXlength.textContent = "LZ77 + Huffman 長度 : " + mixedResult.mixed.length;
     MIXlengthSummary.textContent = mixedResult.mixed.length + " 字元";
     DeMIX.textContent = "還原後 : " + mixedResult.decodedText;
+
+    // JSON 預處理
+    try{
+        const parsedJson = JSON.parse(text);
+        const jsonPackResult = UniversalJsonPacker.pack(parsedJson);
+        const DeJsonpack = UniversalJsonPacker.unpack(jsonPackResult);
+
+        JsonTest.textContent = jsonPackResult;
+        JsonLength.textContent = "JsonPacker 長度 : " + jsonPackResult.length;
+        if(JsonlengthSummary) JsonlengthSummary.textContent = jsonPackResult.length + " 字元";
+        DeJson.textContent = "還原後 : " + JSON.stringify(DeJsonpack);
+    }catch(e){
+        JsonTest.textContent = "（非合法 JSON，略過 JSON 專用預處理）";
+        JsonLength.textContent = "";
+        if(JsonlengthSummary) JsonlengthSummary.textContent = "-";
+        DeJson.textContent = "";
+    }
 });

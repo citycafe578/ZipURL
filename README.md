@@ -70,15 +70,73 @@ The selected compression method is stored as a two-character prefix, allowing `d
 
 ZipURL has no runtime dependencies. The package includes `tsup`, `typescript`, and `vitest` as development dependencies.
 
-Install the package and import it:
+### Option 1: Install from npm
 
-```javascript
+```bash
 npm install zipurl
 ```
+
+Then import the package:
 
 ```javascript
 import { compress, decompress } from "zipurl";
 ```
+
+### Option 2: Install directly from GitHub
+
+You can install the package directly from the GitHub repository without publishing it to the npm Registry:
+
+```bash
+npm install github:citycafe578/ZipURL
+```
+
+The package name remains `zipurl`, so the import is the same:
+
+```javascript
+import { compress, decompress } from "zipurl";
+```
+
+The repository must include the generated `dist/` directory for this installation method. Before pushing changes, run:
+
+```bash
+npm run build
+git add dist
+git commit -m "build library"
+git push
+```
+
+### Option 3: Use from a browser with a CDN
+
+The browser bundle is available from jsDelivr after `dist/index.global.js` has been pushed to GitHub:
+
+```html
+<!-- Load the library from GitHub through jsDelivr -->
+<script src="https://cdn.jsdelivr.net/gh/citycafe578/ZipURL@main/dist/index.global.js"></script>
+
+<script>
+        const compressed = ZipURL.compress("Hello World!");
+        console.log("Compressed:", compressed);
+        console.log("Decompressed:", ZipURL.decompress(compressed));
+</script>
+```
+
+The global browser bundle exposes the `ZipURL` object with `compress()` and `decompress()` methods.
+
+### Option 4: Use an ES module URL in the browser
+
+Native browser ES modules can import the ESM build directly:
+
+```html
+<script type="module">
+        import { compress, decompress } from "https://cdn.jsdelivr.net/gh/citycafe578/ZipURL@main/dist/index.js";
+
+        const compressed = compress("Hello World!");
+        console.log("Compressed:", compressed);
+        console.log("Decompressed:", decompress(compressed));
+</script>
+```
+
+For Vue, React, or Vite projects, installing from npm or GitHub is generally the more reliable option because the bundler can resolve the package normally.
 
 ## Basic Usage
 
@@ -366,7 +424,7 @@ scripts/
 └── copy-types.mjs # Copies declarations into dist during build
 test/
 └── library.test.js
-dist/              # Generated build output, ignored by Git
+dist/              # Generated build output, committed for CDN/GitHub installs
 ```
 
 ## Important Notes

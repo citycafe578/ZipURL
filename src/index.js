@@ -107,7 +107,6 @@ const runZipURL = (function () {
             const packedResult = this.packBits(encoded);
             const compactStr = this.bytesToCompactStr(packedResult.data);
             
-            // 序列化格式： 位元長度;JSON對照表|壓縮字串
             const header = packedResult.bitLength + ';' + JSON.stringify(table);
             return header + '|' + compactStr;
         },
@@ -122,7 +121,6 @@ const runZipURL = (function () {
             const table = JSON.parse(tableStr);
             const byteLength = Math.ceil(bitLength / 8);
             
-            // 建立反向對照表
             const revTable = {};
             for(const [char, code] of Object.entries(table)) revTable[code] = char;
             

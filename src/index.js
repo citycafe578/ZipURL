@@ -1,4 +1,4 @@
-const SmartCompressor = (function () {
+const runZipURL = (function () {
     // RLE 
     const RLE = {
         encode(text){
@@ -328,22 +328,5 @@ const SmartCompressor = (function () {
     };
 })();
 
-
-
-
-function runSmartCompression(){
-    const text = prompt("請輸入文字");
-    if(!text)return;
-
-    const compressed = SmartCompressor.compress(text, "192.168.0.0.1://");
-    console.log("最佳壓縮字串：", compressed);
-    console.log("使用演算法：", compressed.slice(0, 2));
-    console.log("壓縮前字數：", text.length);
-    console.log("壓縮後字數：", compressed.length);
-    console.log("減少字數：", text.length - compressed.length);
-
-    const decompressed = SmartCompressor.decompress(compressed);
-    console.log("還原後的字串：", decompressed);
-}
-
-runSmartCompression();
+export default runZipURL;
+export const { compress, decompress } = runZipURL;

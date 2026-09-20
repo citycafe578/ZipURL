@@ -1,0 +1,49 @@
+{
+  "name": "zipurl",
+  "version": "1.0.0",
+  "description": "Adaptive string compressor that automatically selects the shortest encoding.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.global.js",
+  "jsdelivr": "./dist/index.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.global.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.js --format cjs,esm,iife --global-name ZipURL --clean && node scripts/copy-types.mjs",
+    "dev": "tsup src/index.js --format cjs,esm,iife --global-name ZipURL --watch",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/citycafe578/ZipURL.git"
+  },
+  "keywords": [
+    "compression",
+    "huffman",
+    "lz77",
+    "rle",
+    "json-compression"
+  ],
+  "author": "citycafe578",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/citycafe578/ZipURL/issues"
+  },
+  "homepage": "https://github.com/citycafe578/ZipURL#readme",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}
